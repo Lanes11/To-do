@@ -8,16 +8,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         remove(task.id);
 
-        DoublyLinkedList.Node<Task> node = history.linkLast(task);
-        historyMap.put(task.id, node);
-
+        historyMap.put(task.id, history.linkLast(task));
     }
 
     @Override
     public void remove(int id) {
         if (historyMap.containsKey(id)) {
-            DoublyLinkedList.Node<Task> node = historyMap.get(id);
-            history.removeNode(node);
+            history.removeNode(historyMap.get(id));
         }
     }
 

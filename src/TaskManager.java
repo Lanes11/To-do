@@ -1,20 +1,22 @@
 public interface TaskManager {
     void printMainMenu();
-    Task cteateTask();
-    Epic cteateEpic();
-    SubTask createSubTask();
-    void updateTask();
-    void updateEpic();
-    void updateSubTask();
+    String[] readTaskDetails();
+    void createTask(String name, String description);
+    void createEpic(String name, String description);
+    void createSubTask(String name, String description, int epicId);
+    void updateEnity();
+    void updateTask(int id, String name, String description);
+    void updateEpic(int id, String name, String description);
+    void updateSubTask(int id, String name, String description, int epicId);
     void printTasks();
     void printEpics();
     void printSubTasks();
-    void updateEnity();
-    void getByIdentifier();
-    void getTask(int identifier);
-    void getEpic(int identifier);
-    void getSubTask(int identifier);
+    void printAllTasks();
+    void getById(int id);
+    void getTask(int id);
+    void getEpic(int id);
+    void getSubTask(int id);
     void deletingAllTasks();
-    void deleteByIdentifier();
+    void deleteById(int id);
     void checkingStatusAndSubTasksEpics();
 }

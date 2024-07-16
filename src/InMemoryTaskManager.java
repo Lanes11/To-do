@@ -29,18 +29,31 @@ public class InMemoryTaskManager implements TaskManager {
 
             int operation = scanner.nextInt();
             switch (operation) {
-                case 1 -> {tasks.put(id, cteateTask()); id++;}
-                case 2 -> {epics.put(id, cteateEpic()); id++;}
-                case 3 -> {subTasks.put(id, createSubTask()); id++;}
-                case 4 -> updateEnity();
-                case 5 -> {
-                    printTasks();
-                    printEpics();
-                    printSubTasks();
+                case 1 -> {
+                    String[] taskDetails = readTaskDetails();
+                    createTask(taskDetails[0], taskDetails[1]);
                 }
+                case 2 -> {
+                    String[] taskDetails = readTaskDetails();
+                    createEpic(taskDetails[0], taskDetails[1]);
+                }
+                case 3 -> {
+                    String[] taskDetails = readTaskDetails();
+                    System.out.print("Эпик: ");
+                    int epicId = scanner.nextInt();
+                    createSubTask(taskDetails[0], taskDetails[1], epicId);
+                }
+                case 4 -> updateEnity();
+                case 5 -> printAllTasks();
                 case 6 -> deletingAllTasks();
-                case 7 -> getByIdentifier();
-                case 8 -> deleteByIdentifier();
+                case 7 -> {
+                    System.out.println("Id: ");
+                    getById(scanner.nextInt());
+                }
+                case 8 -> {
+                    System.out.println("Id: ");
+                    deleteById(scanner.nextInt());
+                }
                 case 9 -> System.out.println(historyManager.getHistory());
                 default -> System.out.println("Такой операции нет!");
             }
@@ -48,38 +61,31 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task cteateTask() {
+    public String[] readTaskDetails() {
         scanner.nextLine();
         System.out.print("Название: ");
         String name = scanner.nextLine();
         System.out.print("Описание: ");
         String description = scanner.nextLine();
-
-        return new Task(id, name, description, Status.NEW);
+        return new String[] { name, description };
     }
 
     @Override
-    public Epic cteateEpic() {
-        scanner.nextLine();
-        System.out.print("Название: ");
-        String name = scanner.nextLine();
-        System.out.print("Описание: ");
-        String description = scanner.nextLine();
-
-        return new Epic(id, name, description, Status.NEW, new ArrayList<>());
+    public void createTask(String name, String description) {
+        tasks.put(id, new Task(id, name, description, Status.NEW));
+        id++;
     }
 
     @Override
-    public SubTask createSubTask() {
-        scanner.nextLine();
-        System.out.print("Название: ");
-        String name = scanner.nextLine();
-        System.out.print("Описание: ");
-        String description = scanner.nextLine();
-        System.out.print("Эпик: ");
-        Integer epicIdentifier = scanner.nextInt();
+    public void createEpic(String name, String description) {
+        epics.put(id, new Epic(id, name, description, Status.NEW, new ArrayList<>()));
+        id++;
+    }
 
-        return new SubTask(id, name, description, Status.NEW, epicIdentifier);
+    @Override
+    public void createSubTask(String name, String description, int epicId) {
+        subTasks.put(id, new SubTask(id, name, description, Status.NEW, epicId));
+        id++;
     }
 
     @Override
@@ -88,39 +94,54 @@ public class InMemoryTaskManager implements TaskManager {
                 "1. Обновление задачи\n" +
                 "2. Обновление эпика\n" +
                 "3. Обновление подзадачи");
-
         int operation = scanner.nextInt();
 
-        switch (operation) {
-            case 1 -> updateTask();
-            case 2 -> updateEpic();
-            case 3 -> updateSubTask();
-            default -> System.out.println("Такой операции нет!");
+        System.out.print("Id: ");
+        int id = scanner.nextInt();
+
+        if (!tasks.containsKey(id) && !epics.containsKey(id) && !subTasks.containsKey(id)) {
+            System.out.println("Задачи с таким id нет!");
+        } else {
+            switch (operation) {
+                case 1 -> {
+                    String[] taskDetails = readTaskDetails();
+                    updateTask(id, taskDetails[0], taskDetails[1]);
+                }
+                case 2 -> {
+                    String[] taskDetails = readTaskDetails();
+                    updateEpic(id, taskDetails[0], taskDetails[1]);
+                }
+                case 3 -> {
+                    String[] taskDetails = readTaskDetails();
+                    System.out.print("Эпик: ");
+                    int epicId = scanner.nextInt();
+                    updateSubTask(id, taskDetails[0], taskDetails[1], epicId);
+                }
+                default -> System.out.println("Такой операции нет!");
+            }
         }
     }
 
     @Override
-    public void updateTask() {
-        System.out.print("Индекс задачи, которую нужно заменить: ");
-        int identifier = scanner.nextInt();
-
-        tasks.put(identifier, cteateTask());
+    public void updateTask(int id, String name, String description) {
+        tasks.put(id, new Task(id, name, description, Status.NEW));
     }
 
     @Override
-    public void updateEpic() {
-        System.out.print("Индекс эпика, которого нужно заменить: ");
-        int identifier = scanner.nextInt();
-
-        tasks.put(identifier, cteateEpic());
+    public void updateEpic(int id, String name, String description) {
+        epics.put(id, new Epic(id, name, description, Status.NEW, new ArrayList<>()));
     }
 
     @Override
-    public void updateSubTask() {
-        System.out.print("Индекс подзадачи, которой нужно заменить: ");
-        int identifier = scanner.nextInt();
+    public void updateSubTask(int id, String name, String description, int epicId) {
+        subTasks.put(id, new SubTask(id, name, description, Status.NEW, epicId));
+    }
 
-        tasks.put(identifier, createSubTask());
+    @Override
+    public void printAllTasks() {
+        printTasks();
+        printEpics();
+        printSubTasks();
     }
 
     @Override
@@ -155,54 +176,45 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void getByIdentifier() {
-        System.out.println("Выберите операцию:\n" +
-                "1. Получить задачу\n" +
-                "2. Получить эпик\n" +
-                "3. Получить подзадачу");
-        int operation = scanner.nextInt();
-
-        System.out.print("Индентификатор: ");
-        int identifier = scanner.nextInt();
-
-        switch (operation) {
-            case 1 -> getTask(identifier);
-            case 2 -> getEpic(identifier);
-            case 3 -> getSubTask(identifier);
-            default -> System.out.println("Такой операции нет!");
+    public void getById(int id) {
+        if (tasks.containsKey(id)) {
+            getTask(id);
+        } else if (epics.containsKey(id)) {
+            getEpic(id);
+        } else if (subTasks.containsKey(id)) {
+            getSubTask(id);
+        } else {
+            System.out.println("Задачи с таким id нет!");
         }
     }
 
     @Override
-    public void getTask(int identifier){
-        Task task = tasks.get(identifier);
-        System.out.println(identifier + ": имя — " + task.name + "; описание — " + task.description + "; статус — " + task.status);
+    public void getTask(int id){
+        Task task = tasks.get(id);
+        System.out.println(id + ": имя — " + task.name + "; описание — " + task.description + "; статус — " + task.status);
 
         historyManager.add(task);
     }
 
     @Override
-    public void getEpic(int identifier){
-        Epic epic = epics.get(identifier);
-        System.out.println(identifier + ": имя — " + epic.name + "; описание — " + epic.description + "; статус — " + epic.status + "; подзадачи — " + epic.subTasksId);
+    public void getEpic(int id){
+        Epic epic = epics.get(id);
+        System.out.println(id + ": имя — " + epic.name + "; описание — " + epic.description + "; статус — " + epic.status + "; подзадачи — " + epic.subTasksId);
 
         historyManager.add(epic);
     }
 
     @Override
-    public void getSubTask(int identifier){
-        SubTask subTask = subTasks.get(identifier);
-        System.out.println(identifier + ": имя — " + subTask.name + "; описание — " + subTask.description + "; статус — " + subTask.status + "; эпик — " + subTask.epicId);
+    public void getSubTask(int id){
+        SubTask subTask = subTasks.get(id);
+        System.out.println(id + ": имя — " + subTask.name + "; описание — " + subTask.description + "; статус — " + subTask.status + "; эпик — " + subTask.epicId);
 
         historyManager.add(subTask);
     }
 
     @Override
-    public void deleteByIdentifier() {
-        System.out.print("Индентификатор: ");
-        int identifier = scanner.nextInt();
-
-        if (tasks.remove(identifier)==null && subTasks.remove(identifier)==null && epics.remove(identifier)==null) {
+    public void deleteById(int id) {
+        if (tasks.remove(id)==null && subTasks.remove(id)==null && epics.remove(id)==null) {
             System.out.println("Такого индентификатора нет!");
         }
     }
@@ -243,6 +255,4 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
     }
-
-
 }
