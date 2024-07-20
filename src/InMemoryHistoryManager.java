@@ -1,3 +1,5 @@
+import Type.Task;
+
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -44,12 +46,11 @@ class DoublyLinkedList<T> {
         Node<T> newNode = new Node<>(data);
         if (head == null) {
             head = newNode;
-            tail = newNode;
         } else {
             tail.next = newNode;
             newNode.prev = tail;
-            tail = newNode;
         }
+        tail = newNode;
         return newNode;
     }
 
@@ -63,30 +64,31 @@ class DoublyLinkedList<T> {
         return tasks;
     }
 
-    public Node<T> removeNode(Node<T> node) {
-        if (head == null && tail == null) {
-            return null;
-        } else if (node == head) {
-            if (node.next == null){
-                return null;
-            }else {
+    public void removeNode(Node<T> node) {
+        if (node == head) {
+            if (node.next != null) {
                 head = node.next;
                 head.prev = null;
-                return head;
-            }
-
-        } else if (node == tail) {
-            if (node.prev == null){
-                return null;
             } else {
+                head = null;
+                tail = null;
+            }
+        } else if (node == tail) {
+            if (node.prev != null) {
                 tail = node.prev;
                 tail.next = null;
-                return head;
+            } else {
+                head = null;
+                tail = null;
             }
         } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-            return head;
+            if (node.prev != null) {
+                node.prev.next = node.next;
+            }
+            if (node.next != null) {
+                node.next.prev = node.prev;
+            }
         }
+
     }
 }

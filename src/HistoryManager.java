@@ -1,3 +1,5 @@
+import Type.Task;
+
 import java.util.List;
 
 public interface HistoryManager {

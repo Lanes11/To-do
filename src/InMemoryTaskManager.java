@@ -1,13 +1,15 @@
 import java.util.*;
+import Enum.*;
+import Type.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    static InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-    Scanner scanner = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);
 
-    HashMap<Integer, Task> tasks = new HashMap<>();
-    HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HashMap<Integer, Epic> epics = new HashMap<>();
+    static HashMap<Integer, Task> tasks = new HashMap<>();
+    static HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    static HashMap<Integer, Epic> epics = new HashMap<>();
 
     int id = 0;
 
@@ -16,16 +18,18 @@ public class InMemoryTaskManager implements TaskManager {
         while (true) {
             checkingStatusAndSubTasksEpics();
 
-            System.out.println("Выберите операцию:\n" +
-                    "1. Создать задачу\n" +
-                    "2. Создать эпик\n" +
-                    "3. Создать подзадачу\n" +
-                    "4. Обновление\n" +
-                    "5. Список всех задач\n" +
-                    "6. Удаление всех задач\n"+
-                    "7. Получить по индентификатору\n" +
-                    "8. Удалить по индентификатору\n"+
-                    "9. Посмотреть историю просмотренных задач");
+            System.out.println("""
+                    Выберите операцию:
+                    1. Создать задачу
+                    2. Создать эпик
+                    3. Создать подзадачу
+                    4. Обновление
+                    5. Список всех задач
+                    6. Удаление всех задач
+                    7. Получить по индентификатору
+                    8. Удалить по индентификатору
+                    9. Посмотреть историю просмотренных задач
+                    """);
 
             int operation = scanner.nextInt();
             switch (operation) {
@@ -47,11 +51,11 @@ public class InMemoryTaskManager implements TaskManager {
                 case 5 -> printAllTasks();
                 case 6 -> deletingAllTasks();
                 case 7 -> {
-                    System.out.println("Id: ");
+                    System.out.print("Id: ");
                     getById(scanner.nextInt());
                 }
                 case 8 -> {
-                    System.out.println("Id: ");
+                    System.out.print("Id: ");
                     deleteById(scanner.nextInt());
                 }
                 case 9 -> System.out.println(historyManager.getHistory());
@@ -90,10 +94,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEnity(){
-        System.out.println("Выберите операцию:\n" +
-                "1. Обновление задачи\n" +
-                "2. Обновление эпика\n" +
-                "3. Обновление подзадачи");
+        System.out.println("""
+                Выберите операцию:
+                1. Обновление задачи
+                2. Обновление эпика
+                3. Обновление подзадачи
+                """ );
         int operation = scanner.nextInt();
 
         System.out.print("Id: ");
