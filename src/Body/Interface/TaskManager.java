@@ -1,3 +1,5 @@
+package Body.Interface;
+
 public interface TaskManager {
     void printMainMenu();
     String[] readTaskDetails();

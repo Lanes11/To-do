@@ -1,4 +1,7 @@
-import Type.Task;
+package Body.Manager;
+
+import Body.Interface.HistoryManager;
+import Model.Type.Task;
 
 import java.util.*;
 

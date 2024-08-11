@@ -1,4 +1,4 @@
-package Enum;
+package Model.Enum;
 
 public enum Status {
     NEW,

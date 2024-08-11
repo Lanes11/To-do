@@ -1,4 +1,6 @@
-import Type.Task;
+package Body.Interface;
+
+import Model.Type.Task;
 
 import java.util.List;
 

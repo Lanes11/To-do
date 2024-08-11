@@ -1,3 +1,5 @@
+package Body.Manager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -6,14 +8,15 @@ import java.util.List;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import Enum.*;
-import Type.*;
+
+import Model.Type.*;
+import Model.Enum.*;
 
 public class FileBackendTasksManager extends InMemoryTaskManager{
     private static final Logger logger = Logger.getLogger(FileBackendTasksManager.class.getName());
 
     public static void toSave(){
-        try (FileWriter save = new FileWriter("Save.txt")) {
+        try (FileWriter save = new FileWriter("Save.csv")) {
             save.write("id,type,name,description,status,epicId");
             for (Task task: tasks.values()){
                 save.write("\n" + task.id + ',' + Type.TASK + ',' +  task.name + ',' + task.description + ',' + task.status + ',');
@@ -80,7 +83,7 @@ public class FileBackendTasksManager extends InMemoryTaskManager{
 
     public void fromSave(){
         try{
-            List<String> lines = Files.readAllLines(Paths.get("Save.txt"));
+            List<String> lines = Files.readAllLines(Paths.get("Save.csv"));
             lines.removeFirst();
             for (String line : lines) {
                 if (line.length()>3){

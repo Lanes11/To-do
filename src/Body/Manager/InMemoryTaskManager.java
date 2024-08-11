@@ -1,6 +1,10 @@
+package Body.Manager;
+
 import java.util.*;
-import Enum.*;
-import Type.*;
+
+import Body.Interface.TaskManager;
+import Model.Type.*;
+import Model.Enum.*;
 
 public class InMemoryTaskManager implements TaskManager {
     static InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
@@ -197,7 +201,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void getTask(int id){
         Task task = tasks.get(id);
-        System.out.println(id + ": имя — " + task.name + "; описание — " + task.description + "; статус — " + task.status);
+        System.out.println(task);
 
         historyManager.add(task);
     }
@@ -205,7 +209,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void getEpic(int id){
         Epic epic = epics.get(id);
-        System.out.println(id + ": имя — " + epic.name + "; описание — " + epic.description + "; статус — " + epic.status + "; подзадачи — " + epic.subTasksId);
+        System.out.println(epic);
 
         historyManager.add(epic);
     }
@@ -213,7 +217,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void getSubTask(int id){
         SubTask subTask = subTasks.get(id);
-        System.out.println(id + ": имя — " + subTask.name + "; описание — " + subTask.description + "; статус — " + subTask.status + "; эпик — " + subTask.epicId);
+        System.out.println(subTask);
 
         historyManager.add(subTask);
     }
