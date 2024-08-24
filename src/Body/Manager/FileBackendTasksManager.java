@@ -15,16 +15,21 @@ import Model.Enum.*;
 public class FileBackendTasksManager extends InMemoryTaskManager{
     private static final Logger logger = Logger.getLogger(FileBackendTasksManager.class.getName());
 
-    public static void toSave(){
+    private final ArrayList<Task> tasks = getTasks();
+    private final ArrayList<Epic> epics = getEpics();
+    private final ArrayList<SubTask> subTasks = getSubTasks();
+
+    public void toSave(){
         try (FileWriter save = new FileWriter("Save.csv")) {
             save.write("id,type,name,description,status,epicId");
-            for (Task task: tasks.values()){
+
+            for (Task task: tasks){
                 save.write("\n" + task.id + ',' + Type.TASK + ',' +  task.name + ',' + task.description + ',' + task.status + ',');
             }
-            for (Epic epic: epics.values()){
+            for (Epic epic: epics){
                 save.write("\n" + epic.id + ',' + Type.EPIC + ',' +  epic.name + ',' + epic.description + ',' + epic.status + ',');
             }
-            for (SubTask subTask: subTasks.values()){
+            for (SubTask subTask: subTasks){
                 save.write("\n" + subTask.id + ',' + Type.SUBTASK + ',' +  subTask.name + ',' + subTask.description + ',' + subTask.status + ',' + subTask.epicId);
             }
 
@@ -39,46 +44,42 @@ public class FileBackendTasksManager extends InMemoryTaskManager{
     }
     
     @Override
-    public void createTask(String name, String description){
-        super.createTask(name, description);
-        toSave();
-
-    }
-
-    @Override
-    public void createEpic(String name, String description){
-        super.createEpic(name, description);
+    public void createTask(Task task){
+        super.createTask(task);
         toSave();
     }
 
     @Override
-    public void createSubTask(String name, String description, int epicId){
-        super.createSubTask(name, description, epicId);
+    public void createEpic(Epic epic){
+        super.createEpic(epic);
         toSave();
     }
 
     @Override
-    public void getTask(int id){
-        super.getTask(id);
+    public void createSubTask(SubTask subTask){
+        super.createSubTask(subTask);
         toSave();
     }
 
     @Override
-    public void getEpic(int id){
-        super.getEpic(id);
+    public Task getTask(int id){
         toSave();
+
+        return super.getTask(id);
     }
 
     @Override
-    public void getSubTask(int id){
-        super.getSubTask(id);
+    public Epic getEpic(int id){
         toSave();
+
+        return super.getEpic(id);
     }
 
     @Override
-    public void printMainMenu(){
-        fromSave();
-        super.printMainMenu();
+    public SubTask getSubTask(int id){
+        toSave();
+
+        return super.getSubTask(id);
     }
 
     public void fromSave(){
@@ -89,11 +90,11 @@ public class FileBackendTasksManager extends InMemoryTaskManager{
                 if (line.length()>3){
                     String[] values = line.split(",");
                     if (values[1].equals(Type.TASK.toString())){
-                        tasks.put(Integer.parseInt(values[0]), new Task(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4])));
+                        tasks.add(new Task(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4])));
                     } else if (values[2].equals(Type.SUBTASK.toString())){
-                        subTasks.put(Integer.parseInt(values[0]), new SubTask(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), Integer.parseInt(values[5])));
+                        subTasks.add(new SubTask(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), Integer.parseInt(values[5])));
                     } else if (values[2].equals(Type.EPIC.toString())){
-                        epics.put(Integer.parseInt(values[0]), new Epic(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), new ArrayList<>()));
+                        epics.add(new Epic(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), new ArrayList<>()));
                     } else {
                         for (String value: values){
                             if(tasks.get(Integer.parseInt(value))!=null){

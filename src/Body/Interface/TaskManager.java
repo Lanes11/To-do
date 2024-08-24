@@ -1,24 +1,39 @@
 package Body.Interface;
 
+import Model.Type.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public interface TaskManager {
-    void printMainMenu();
-    String[] readTaskDetails();
-    void createTask(String name, String description);
-    void createEpic(String name, String description);
-    void createSubTask(String name, String description, int epicId);
-    void updateEnity();
-    void updateTask(int id, String name, String description);
-    void updateEpic(int id, String name, String description);
-    void updateSubTask(int id, String name, String description, int epicId);
-    void printTasks();
-    void printEpics();
-    void printSubTasks();
-    void printAllTasks();
-    void getById(int id);
-    void getTask(int id);
-    void getEpic(int id);
-    void getSubTask(int id);
-    void deletingAllTasks();
+    /*Create*/
+    void createTask(Task task);
+    void createEpic(Epic epic);
+    void createSubTask(SubTask subtask);
+
+    /*Update*/
+    void updateEnity(int id);
+    void updateTask(Task task);
+    void updateEpic(Epic epic);
+    void updateSubTask(SubTask subTask);
+
+    /*Get Tasks*/
+    ArrayList<Task> getTasks();
+    ArrayList<Epic> getEpics();
+    ArrayList<SubTask> getSubTasks();
+
+    /*Get by id*/
+    Task getTask(int id);
+    Epic getEpic(int id);
+    SubTask getSubTask(int id);
+
+    /*Delete*/
+    void deleteAllTasks();
     void deleteById(int id);
+
+    /*Print*/
+    void printAllTasks();
+    void printById(int id);
+
     void checkingStatusAndSubTasksEpics();
 }
