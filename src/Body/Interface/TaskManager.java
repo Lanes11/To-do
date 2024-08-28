@@ -3,7 +3,6 @@ package Body.Interface;
 import Model.Type.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public interface TaskManager {
     /*Create*/

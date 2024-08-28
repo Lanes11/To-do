@@ -1,5 +1,6 @@
 package Body.Manager;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -12,24 +13,23 @@ import java.nio.file.Paths;
 import Model.Type.*;
 import Model.Enum.*;
 
-public class FileBackendTasksManager extends InMemoryTaskManager{
-    private static final Logger logger = Logger.getLogger(FileBackendTasksManager.class.getName());
-
-    private final ArrayList<Task> tasks = getTasks();
-    private final ArrayList<Epic> epics = getEpics();
-    private final ArrayList<SubTask> subTasks = getSubTasks();
+public class FileBackendTaskManager extends InMemoryTaskManager{
+    private static final Logger logger = Logger.getLogger(FileBackendTaskManager.class.getName());
 
     public void toSave(){
         try (FileWriter save = new FileWriter("Save.csv")) {
             save.write("id,type,name,description,status,epicId");
 
-            for (Task task: tasks){
+            for (int taskId: tasks.keySet()){
+                Task task = tasks.get(taskId);
                 save.write("\n" + task.id + ',' + Type.TASK + ',' +  task.name + ',' + task.description + ',' + task.status + ',');
             }
-            for (Epic epic: epics){
+            for (int epicId: epics.keySet()){
+                Epic epic = epics.get(epicId);
                 save.write("\n" + epic.id + ',' + Type.EPIC + ',' +  epic.name + ',' + epic.description + ',' + epic.status + ',');
             }
-            for (SubTask subTask: subTasks){
+            for (int subTaskId: subTasks.keySet()){
+                SubTask subTask = subTasks.get(subTaskId);
                 save.write("\n" + subTask.id + ',' + Type.SUBTASK + ',' +  subTask.name + ',' + subTask.description + ',' + subTask.status + ',' + subTask.epicId);
             }
 
@@ -41,6 +41,12 @@ public class FileBackendTasksManager extends InMemoryTaskManager{
         } catch (IOException e) {
             logger.log(Level.SEVERE, "An error occurred", e);
         }
+    }
+
+    @Override
+    public void printMainMenu(){
+        fromSave();
+        super.printMainMenu();
     }
     
     @Override
@@ -90,11 +96,11 @@ public class FileBackendTasksManager extends InMemoryTaskManager{
                 if (line.length()>3){
                     String[] values = line.split(",");
                     if (values[1].equals(Type.TASK.toString())){
-                        tasks.add(new Task(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4])));
+                        tasks.put(id, new Task(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4])));
                     } else if (values[2].equals(Type.SUBTASK.toString())){
-                        subTasks.add(new SubTask(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), Integer.parseInt(values[5])));
+                        subTasks.put(id, new SubTask(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), Integer.parseInt(values[5])));
                     } else if (values[2].equals(Type.EPIC.toString())){
-                        epics.add(new Epic(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), new ArrayList<>()));
+                        epics.put(id, new Epic(Integer.parseInt(values[0]), values[2], values[3], Status.valueOf(values[4]), new ArrayList<>()));
                     } else {
                         for (String value: values){
                             if(tasks.get(Integer.parseInt(value))!=null){

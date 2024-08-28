@@ -1,7 +1,6 @@
-import Body.Manager.InMemoryTaskManager;
-import org.junit.jupiter.api.Test;
+package ManagerTests;
 
-import static org.junit.jupiter.api.Assertions.*;
+import Body.Manager.InMemoryTaskManager;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 

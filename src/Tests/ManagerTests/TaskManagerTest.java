@@ -1,9 +1,10 @@
+package ManagerTests;
+
 import Body.Interface.TaskManager;
-import Model.Enum.Status;
-import Model.Type.Epic;
-import Model.Type.SubTask;
-import Model.Type.Task;
-import org.junit.jupiter.api.BeforeAll;
+
+import Model.Enum.*;
+import Model.Type.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class TaskManagerTest<T extends TaskManager> {
+public abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
 
     abstract T createTaskManager();
