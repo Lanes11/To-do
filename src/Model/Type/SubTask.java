@@ -2,23 +2,32 @@ package Model.Type;
 
 import Model.Enum.Status;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
 
-    public Integer epicId;
+    private final Integer epicId;
 
-    public SubTask(int id, String name, String description, Status status, Integer epicId){
-        super(id, name, description, status);
+    public SubTask(int id, String name, String description, Status status, Integer epicId, Duration duration, LocalDateTime startTime){
+        super(id, name, description, status, duration, startTime);
         this.epicId = epicId;
+    }
+
+    public Integer getEpicId(){
+        return epicId;
     }
 
     @Override
     public String toString() {
         return "SubTask{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                ", epicId='" + epicId + '\'' +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", epicId='" + getEpicId() + '\'' +
+                ", startTime='" + getStartTime() + '\'' +
+                ", endTime='" + getEndTime() + '\'' +
                 '}' + '\n';
     }
 }

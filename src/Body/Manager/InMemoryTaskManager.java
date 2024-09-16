@@ -6,6 +6,10 @@ import Body.Interface.TaskManager;
 import Model.Type.*;
 import Model.Enum.*;
 
+import java.time.Instant;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class InMemoryTaskManager implements TaskManager {
     public final InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
@@ -36,7 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
             switch (operation) {
                 case 1 -> {
                     String[] taskDetails = readTaskDetails();
-                    createTask(new Task(id, taskDetails[0], taskDetails[1], Status.NEW));
+                    createTask(new Task(id, taskDetails[0], taskDetails[1], Status.NEW, Duration.ofSeconds(Integer.parseInt(taskDetails[2])), LocalDateTime.now()));
                 }
                 case 2 -> {
                     String[] taskDetails = readTaskDetails();
@@ -46,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
                     String[] taskDetails = readTaskDetails();
                     System.out.print("Эпик: ");
                     int epicId = scanner.nextInt();
-                    createSubTask(new SubTask(id, taskDetails[0], taskDetails[1], Status.NEW, epicId));
+                    createSubTask(new SubTask(id, taskDetails[0], taskDetails[1], Status.NEW, epicId, Duration.ofSeconds(Integer.parseInt(taskDetails[2])), LocalDateTime.now()));
                 }
                 case 4 -> {
                     System.out.print("Id: ");
@@ -74,7 +78,9 @@ public class InMemoryTaskManager implements TaskManager {
         String name = scanner.nextLine();
         System.out.print("Описание: ");
         String description = scanner.nextLine();
-        return new String[] { name, description };
+        System.out.print("Длительность: ");
+        String duration = scanner.nextLine();
+        return new String[] { name, description, duration };
     }
 
     /*Create*/
@@ -103,7 +109,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEnity(int id){
         if(tasks.containsKey(id)) {
             String[] taskDetails = readTaskDetails();
-            updateTask(new Task(id, taskDetails[0], taskDetails[1], Status.NEW));
+            updateTask(new Task(id, taskDetails[0], taskDetails[1], Status.NEW, Duration.ofSeconds(Integer.parseInt(taskDetails[1])), LocalDateTime.now()));
         } else if (epics.containsKey(id)) {
             String[] taskDetails = readTaskDetails();
             updateEpic(new Epic(id, taskDetails[0], taskDetails[1], Status.NEW, new ArrayList<>()));
@@ -111,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
             String[] taskDetails = readTaskDetails();
             System.out.print("Эпик: ");
             int epicId = scanner.nextInt();
-            updateSubTask(new SubTask(id, taskDetails[0], taskDetails[1], Status.NEW, epicId));
+            updateSubTask(new SubTask(id, taskDetails[0], taskDetails[1], Status.NEW, epicId, Duration.ofSeconds(Integer.parseInt(taskDetails[1])), LocalDateTime.now()));
         } else {
             System.out.println("Задачи с таким id нет!");
         }
@@ -119,17 +125,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        tasks.put(task.id, task);
+        tasks.put(task.getId(), task);
     }
 
     @Override
     public void updateEpic(Epic epic) {
-        epics.put(epic.id, epic);
+        epics.put(epic.getId(), epic);
     }
 
     @Override
     public void updateSubTask(SubTask subTask) {
-        subTasks.put(subTask.id, subTask);
+        subTasks.put(subTask.getId(), subTask);
 
         checkingStatusAndSubTasksEpics();
     }
@@ -248,11 +254,11 @@ public class InMemoryTaskManager implements TaskManager {
         for (Integer indexEpic : epics.keySet()) {
             Epic epic = epics.get(indexEpic);
             int countInProgress = 0, countDone = 0, countNew = 0;
-            for(int k = 0; k<epic.subTasksId.size(); k++){
-                for (int indexSubTaskIdentifier : epic.subTasksId) {
-                    if (subTasks.get(indexSubTaskIdentifier).status.equals(Status.IN_PROGRESS)) {
+            for(int k = 0; k<epic.getSubTasksId().size(); k++){
+                for (int indexSubTaskIdentifier : epic.getSubTasksId()) {
+                    if (subTasks.get(indexSubTaskIdentifier).getStatus().equals(Status.IN_PROGRESS)) {
                         countInProgress++;
-                    } else if (subTasks.get(indexSubTaskIdentifier).status.equals(Status.DONE)) {
+                    } else if (subTasks.get(indexSubTaskIdentifier).getStatus().equals(Status.DONE)) {
                         countDone++;
                     } else {
                         countNew++;
@@ -261,22 +267,49 @@ public class InMemoryTaskManager implements TaskManager {
             }
 
             if (countInProgress == 0 && countDone == 0) {
-                epic.status = Status.NEW;
+                epic.setStatus(Status.NEW);
             } else if (countInProgress == 0 && countNew == 0) {
-                epic.status = Status.DONE;
+                epic.setStatus(Status.DONE);
             } else {
-                epic.status = Status.IN_PROGRESS;
+                epic.setStatus(Status.IN_PROGRESS);
             }
         }
 
-        for (Integer indexEpic : epics.keySet()) {
-            Epic epic = epics.get(indexEpic);
-            for (Integer indexSubTask: subTasks.keySet()){
-                SubTask subtask = subTasks.get(indexSubTask);
-                if (subtask.epicId.equals(indexEpic) && !epic.subTasksId.contains(indexSubTask)){
-                    epic.subTasksId.add(indexSubTask);
+        for (SubTask subTask: subTasks.values()){
+            int idEpic = subTask.getEpicId();
+            int idSubTask = subTask.getId();
+            if (epics.containsKey(idEpic) && !epics.get(idEpic).getSubTasksId().contains(idSubTask)){
+                epics.get(idEpic).addSubTasksId(idSubTask);
+            }
+        }
+
+        for (Epic epic: epics.values()){
+            ArrayList<LocalDateTime> startTimeDateTimeArrayList = new ArrayList<>();
+            ArrayList<LocalDateTime> endTimeDateTimeArrayList = new ArrayList<>();
+
+            for (int id: epic.getSubTasksId()){
+                startTimeDateTimeArrayList.add(subTasks.get(id).getStartTime());
+                endTimeDateTimeArrayList.add(subTasks.get(id).getEndTime());
+            }
+
+            LocalDateTime minStartTime = startTimeDateTimeArrayList.getFirst();
+            LocalDateTime maxEndTime = endTimeDateTimeArrayList.getFirst();
+
+            for (LocalDateTime startTime: startTimeDateTimeArrayList){
+                if (startTime.isBefore(minStartTime)){
+                    minStartTime = startTime;
                 }
             }
+
+            for (LocalDateTime endTime: endTimeDateTimeArrayList){
+                if (endTime.isAfter(maxEndTime)){
+                    maxEndTime = endTime;
+                }
+            }
+
+            epic.setStartTime(minStartTime);
+            epic.setEndTime(maxEndTime);
+
         }
     }
 }

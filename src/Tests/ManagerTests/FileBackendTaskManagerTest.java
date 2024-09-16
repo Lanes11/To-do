@@ -40,4 +40,19 @@ class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTaskManager>
             e.printStackTrace();
         }
     }
+
+    @Test
+    void fromSaveTest(){
+        taskManager.createTask(new Task(0, "Задача", "Описание задачи", Status.NEW));
+        taskManager.createEpic(new Epic(1, "Эпик", "Описание эпика", Status.NEW, new ArrayList<>()));
+        taskManager.createSubTask(new SubTask(2, "Подзадача", "Описание подзадачи", Status.NEW, 1));
+
+        taskManager.deleteAllTasks();
+
+        taskManager.read();
+
+        assertFalse(taskManager.getTasks().isEmpty(), "Задача не выгрузилась из сейва");
+        assertFalse(taskManager.getEpics().isEmpty(), "Эпик не выгрузился из сейва");
+        assertFalse(taskManager.getSubTasks().isEmpty(), "Подзадача не выгрузилась из сейва");
+    }
 }

@@ -6,14 +6,14 @@ import Model.Type.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    HashMap<Integer, DoublyLinkedList.Node<Task>> historyMap = new HashMap<>();
-    DoublyLinkedList<Task> history = new DoublyLinkedList<>();
+    final HashMap<Integer, DoublyLinkedList.Node<Task>> historyMap = new HashMap<>();
+    final DoublyLinkedList<Task> history = new DoublyLinkedList<>();
 
     @Override
     public void add(Task task) {
-        remove(task.id);
+        remove(task.getId());
 
-        historyMap.put(task.id, history.linkLast(task));
+        historyMap.put(task.getId(), history.linkLast(task));
     }
 
     @Override
@@ -92,6 +92,5 @@ class DoublyLinkedList<T> {
                 node.next.prev = node.prev;
             }
         }
-
     }
 }
